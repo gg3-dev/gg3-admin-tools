@@ -50,6 +50,17 @@ else
     FINAL_HOSTNAME="$VM_HOSTNAME"
 fi
 
+# Installing Git for repo cloning with bootstrapper
+
+if ! GIT_INSTALL=$(ssh -tt -o StrictHostKeyChecking=no -o ConnectTimeout=5 "$VM_USER@$VM_IP" \
+"sudo apt-get update && sudo apt-get install -y git"); then
+  echo "[!] Failed to install Git on $VM_IP. Aborting."
+  exit 1
+fi
+
+echo "[+] Git has been installed"
+echo
+
 # Define key filenames
 KEY_NAME="key.gg3.bootstrap.vm-$FINAL_HOSTNAME"
 PRIVATE_KEY_PATH="$SSH_DIR/$KEY_NAME"
@@ -90,7 +101,7 @@ Timestamp: $(date)
 EOF
 
 # Copy the bootstrap-clone helper script into the staging folder
-LOCAL_CLONE_SCRIPT_PATH="$HOME/admin-tools/bootstrap-clone.sh"  # Adjust if stored elsewhere
+LOCAL_CLONE_SCRIPT_PATH="bootstrap-clone.sh"  # Adjust if stored elsewhere
 
 if [ -f "$LOCAL_CLONE_SCRIPT_PATH" ]; then
     echo "[*] Including bootstrap-clone.sh in staging..."
